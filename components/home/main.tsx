@@ -1,8 +1,16 @@
 "use client";
 
+import { HBL_DATA } from "@/constants/data";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { BackgroundGradient } from "../ui/background-gradient";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const connections = [
   { name: "Bank Alfalah", value: 50000, color: "orange", strokeWidth: 3 },
@@ -26,6 +34,13 @@ const MainComponent = () => {
   const [buttonPosition, setButtonPosition] = useState<
     { x: number; y: number }[]
   >([]);
+
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
+  const [filterOn, setFilterOn] = useState<string>("");
+
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   const updateInitialPositions = () => {
     if (!containerRef.current || !mainCircleRef.current) return;
@@ -75,6 +90,22 @@ const MainComponent = () => {
     });
   };
 
+  const handleSelection = (index: number, value: string) => {
+    if (index === 0) {
+      setSelectedRegion(value);
+      setSelectedArea("");
+      setSelectedBranch("");
+      setFilterOn("region");
+    } else if (index === 1) {
+      setSelectedArea(value);
+      setSelectedBranch("");
+      setFilterOn("area");
+    } else {
+      setSelectedBranch(value);
+      setFilterOn("branch");
+    }
+  };
+
   return (
     <div ref={containerRef} className="relative flex flex-col items-center">
       <div className="w-96 h-96 flex justify-center items-center relative">
@@ -90,19 +121,111 @@ const MainComponent = () => {
             whileTap={{ scale: 0.95 }}
             whileDrag={{ scale: 0.9 }}
             drag
+            onDrag={() => setShowFilters(false)}
             dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+            onClick={() => {
+              setSelectedRegion("");
+              setSelectedArea("");
+              setSelectedBranch("");
+              setFilterOn("");
+              setShowFilters((prev) => !prev);
+            }}
           >
             <div>
               <h1 className="text-white drop-shadow font-semibold">
-                Dr: <span className="text-green-500">10000</span>
+                Dr:{" "}
+                <span className="text-green-500">
+                  {filterOn === "region"
+                    ? 10000
+                    : filterOn === "area"
+                    ? 5000
+                    : filterOn === "branch"
+                    ? 1000
+                    : 500}
+                </span>
               </h1>
               <h1 className="text-white drop-shadow font-semibold">
-                Cr: <span className="text-red-500">5000</span>
+                Cr:{" "}
+                <span className="text-red-500">
+                  {filterOn === "region"
+                    ? 5000
+                    : filterOn === "area"
+                    ? 4000
+                    : filterOn === "branch"
+                    ? 2000
+                    : 1000}
+                </span>
               </h1>
             </div>
           </motion.button>
         </BackgroundGradient>
         {/* </MovingBorderComponent> */}
+        {showFilters && (
+          <>
+            <div className="absolute -right-[150px] top-0 z-50">
+              <Select
+                value={selectedRegion}
+                onValueChange={(value) => handleSelection(0, value)}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select Region" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(HBL_DATA).map((key, index) => (
+                    <SelectItem key={index} value={key}>
+                      {key}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedRegion && (
+              <div className="absolute -right-[200px] top-12 z-50">
+                <Select
+                  value={selectedArea}
+                  onValueChange={(value) => handleSelection(1, value)}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select Area" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedRegion &&
+                      Object.keys(HBL_DATA?.[selectedRegion]).map(
+                        (key, index) => (
+                          <SelectItem key={index} value={key}>
+                            {key}
+                          </SelectItem>
+                        )
+                      )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {selectedRegion && selectedArea && (
+              <div className="absolute -right-[250px] top-24 z-50">
+                <Select
+                  value={selectedBranch}
+                  onValueChange={(value) => handleSelection(2, value)}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select Branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedRegion &&
+                      selectedArea &&
+                      HBL_DATA?.[selectedRegion]?.[selectedArea]?.map(
+                        (key: any, index: number) => (
+                          <SelectItem key={index} value={key}>
+                            {key}
+                          </SelectItem>
+                        )
+                      )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Connections via SVG */}
@@ -135,7 +258,7 @@ const MainComponent = () => {
               if (el) buttonRefs.current[key] = el;
             }}
             key={key}
-            className="w-24 h-24 bg-neutral-800 relative z-10 rounded-full"
+            className="w-24 h-24 bg-neutral-800 relative z-10 rounded-full shadow-md"
             whileDrag={{ scale: 0.9 }}
             drag
             dragConstraints={containerRef}
