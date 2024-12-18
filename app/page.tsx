@@ -6,7 +6,7 @@ export default function Home() {
     <main className="min-h-screen">
       <Navbar />
       <section className="container mx-auto px-12 py-4">
-        <div className="flex justify-center items-center min-h-[calc(100vh-90px)]">
+        <div className="flex items-center min-h-[calc(100vh-70px)] relative">
           <MainComponent />
         </div>
       </section>
