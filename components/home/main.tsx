@@ -303,6 +303,7 @@ const MainComponent = () => {
               dragConstraints={containerRef}
               onDrag={() => handleDrag(key)}
               onDragEnd={() => handleDrag(key)}
+              dragMomentum={false}
             >
               <div>
                 <h1 className="text-white drop-shadow font-semibold text-xs">
