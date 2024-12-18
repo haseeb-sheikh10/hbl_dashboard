@@ -32,7 +32,33 @@ const MainComponent = () => {
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [filterOn, setFilterOn] = useState<string>("");
 
-  const [connections, setConnections] = useState<Bank[]>([]);
+  const [connections, setConnections] = useState<Bank[]>([
+    {
+      name: "Bank 1",
+      debit: 10000,
+      credit: 5000,
+    },
+    {
+      name: "Bank 2",
+      debit: 5000,
+      credit: 4000,
+    },
+    {
+      name: "Bank 3",
+      debit: 1000,
+      credit: 2000,
+    },
+    {
+      name: "Bank 4",
+      debit: 10000,
+      credit: 10000,
+    },
+    {
+      name: "Bank 5",
+      debit: 5000,
+      credit: 5000,
+    },
+  ]);
 
   const updateInitialPositions = () => {
     if (!containerRef.current || !mainCircleRef.current) return;
@@ -132,7 +158,7 @@ const MainComponent = () => {
           >
             <motion.button
               ref={mainCircleRef}
-              className={cn("w-40 h-40 bg-neutral-800 rounded-full")}
+              className={cn("w-44 h-44 bg-neutral-800 rounded-full")}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               whileDrag={{ scale: 0.9 }}
@@ -227,7 +253,10 @@ const MainComponent = () => {
             const endX = mainPosition.x;
             const endY = mainPosition.y;
 
-            const offset = 10;
+            const offset = 15;
+
+            const isDebitGreater =
+              connections[index].debit > connections[index].credit;
 
             return (
               <>
@@ -236,7 +265,7 @@ const MainComponent = () => {
                     key={`line1-${index}`}
                     d={`M${startX},${startY} C${startX},${endY} ${endX},${startY} ${endX},${endY}`}
                     stroke={"#197059"}
-                    strokeWidth="3"
+                    strokeWidth={isDebitGreater ? "16" : "5"}
                     fill="none"
                     markerEnd="url(#arrow-end)" // Add arrow at the end
                   />
@@ -250,10 +279,9 @@ const MainComponent = () => {
                     },${endY + offset} ${endX + offset},${startY + offset} ${
                       endX + offset
                     },${endY + offset}`}
-                    stroke={"#dc2626"}
-                    strokeWidth="3"
+                    stroke={"#ef4444"}
+                    strokeWidth={isDebitGreater ? "5" : "16"}
                     fill="none"
-                    opacity="0.6"
                     markerStart="url(#arrow-start)" // Add arrow at the start
                   />
                 )}
@@ -286,33 +314,11 @@ const MainComponent = () => {
                       Dr:{" "}
                       {selectedMode === "volume" && (
                         <span className="text-green-500">
-                          {filterOn === "region"
-                            ? 10000
-                            : filterOn === "area"
-                            ? 5000
-                            : filterOn === "branch"
-                            ? 1000
-                            : filterOn === "customer"
-                            ? 10000
-                            : filterOn === "account"
-                            ? 5000
-                            : 500}
+                          {connections[key].debit}
                         </span>
                       )}
                       {selectedMode === "count" && (
-                        <span className="text-green-500">
-                          {filterOn === "region"
-                            ? 4
-                            : filterOn === "area"
-                            ? 3
-                            : filterOn === "branch"
-                            ? 2
-                            : filterOn === "customer"
-                            ? 10
-                            : filterOn === "account"
-                            ? 7
-                            : 5}
-                        </span>
+                        <span className="text-green-500">{5}</span>
                       )}
                     </h1>
                   )}
@@ -321,33 +327,11 @@ const MainComponent = () => {
                       Cr:{" "}
                       {selectedMode === "volume" && (
                         <span className="text-red-500">
-                          {filterOn === "region"
-                            ? 5000
-                            : filterOn === "area"
-                            ? 4000
-                            : filterOn === "branch"
-                            ? 2000
-                            : filterOn === "customer"
-                            ? 10000
-                            : filterOn === "account"
-                            ? 5000
-                            : 1000}
+                          {connections[key].credit}
                         </span>
                       )}
                       {selectedMode === "count" && (
-                        <span className="text-red-500">
-                          {filterOn === "region"
-                            ? 3
-                            : filterOn === "area"
-                            ? 4
-                            : filterOn === "branch"
-                            ? 2
-                            : filterOn === "customer"
-                            ? 10
-                            : filterOn === "account"
-                            ? 7
-                            : 3}
-                        </span>
+                        <span className="text-red-500">{3}</span>
                       )}
                     </h1>
                   )}
